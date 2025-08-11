@@ -1,0 +1,65 @@
+services:
+  basic-node-mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin12345
+      MONGO_INITDB_DATABASE: shopsphereDB
+    volumes:
+      - basic-node-vol:/data/db
+    # container_name: basic-node
+    # restart: always
+    # ports:
+    #   - "27017:27017"
+    # healthcheck:
+    #   test: mongosh --eval "db.adminCommand('ping')" --quiet
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    networks:
+      - basic-node-network
+
+  mongo-express:
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin12345
+      ME_CONFIG_MONGODB_SERVER: basic-node-mongo
+      ME_CONFIG_MONGODB_URL: "mongodb://admin:admin12345@basic-node-mongo:27017/shopsphereDB?authSource=admin"
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin12345
+    ports:
+      - "8081:8081"
+    depends_on:
+      - basic-node-mongo
+    # container_name: basic-node-mongo-express
+    # restart: always
+    networks:
+      - basic-node-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://admin:admin12345@basic-node-mongo:27017/shopsphereDB?authSource=admin
+      JWT_SECRET: your_strong_secret_key_here
+      PORT: 5000
+      NODE_ENV: production
+    depends_on:
+      - basic-node-mongo
+    # container_name: basic-node-backend
+    # restart: always
+    networks:
+      - basic-node-network
+
+networks:
+  basic-node-network:
+    driver: bridge
+
+volumes:
+  basic-node-vol:
+
