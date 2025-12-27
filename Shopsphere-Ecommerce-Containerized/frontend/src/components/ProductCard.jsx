@@ -8,12 +8,20 @@ const ProductCard = ({ product }) => {
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full h-full flex flex-col">
       {/* Image Container - Reduced height */}
       <div className="relative pt-[70%] bg-gray-100"> {/* Changed from pb-[120%] to pt-[70%] */}
-        <img
+        {/* <img
           src={`http://localhost:5000${product.image}`}
           alt={product.name}
           className="absolute top-0 left-0 w-full h-full object-cover"
           onError={(e) => {
             e.target.src = 'http://localhost:5000/uploads/placeholder.jpg';
+          }}
+        /> */}
+          <img
+          src={product.image} // ✅ e.g. "/uploads/xyz.jpg"
+          alt={product.name}
+          className="absolute top-0 left-0 w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = '/uploads/placeholder.jpg'; // ✅ relative path
           }}
         />
       </div>
